@@ -308,7 +308,7 @@ namespace Logger
         public static bool TryParse(string s, out ByteSize result)
         {
             // Arg checking
-            if (string.IsNullOrWhiteSpace(s))
+            if (string.IsNullOrEmpty(s))
                 throw new ArgumentNullException("s", "String is null or whitespace");
 
             // Setup the result

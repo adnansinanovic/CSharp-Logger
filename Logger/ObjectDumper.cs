@@ -112,7 +112,7 @@ namespace Logger
             if (Settings.WriteCompilerGeneratedTypes)
                 return false;
 
-            return member.GetCustomAttribute<CompilerGeneratedAttribute>() != null;
+            return member.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true) != null;
         }
 
         private static bool InspectDeepness(TextWriter tw, int depth)
