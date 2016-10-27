@@ -110,10 +110,13 @@ namespace Logger
         private static bool IgnoreElement(MemberInfo member)
         {
             if (Settings.WriteCompilerGeneratedTypes)
-                return false;
-
-            return member.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true) != null;
+                return false;                        
+            
+            var result = member.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true);
+          
+            return result.Length != 0;
         }
+        
 
         private static bool InspectDeepness(TextWriter tw, int depth)
         {
