@@ -41,17 +41,18 @@ namespace Logger
             }
         }
 
-        public static void WriteLine(string message)
+        private static void WriteLine(string message)
         {
             producer.Add($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")} :: {message}{Environment.NewLine}{"-".PadRight(40, '-')} {Environment.NewLine}");
         }
     
-        public static void WriteLine(string[] parameters, bool onItemOneRow = true)
+        public static void WriteLine(object[] parameters, bool onItemOneRow = false)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (string mesagge in parameters)
+            foreach (object mesagge in parameters)
             {
-                sb.Append($"{mesagge}");
+                string dump = ObjectDumper.Write(mesagge);
+                sb.Append($"{dump}");
 
                 if (onItemOneRow)
                     sb.Append(Environment.NewLine);
@@ -60,10 +61,16 @@ namespace Logger
             WriteLine(sb.ToString());
         }
 
-        public static void WriteLine(params string[] parameters)
+        public static void WriteLine(params object[] parameters)
         {
             if (parameters != null)
                 WriteLine(parameters, true);
+        }
+
+        public static void Write(params object[] parameters)
+        {
+            if (parameters != null)
+                WriteLine(parameters, false);
         }
 
         public static void WriteLine(object obj)

@@ -34,6 +34,23 @@ namespace Logger
         {
             int textTabs = currentDepth + 1;
 
+            if (obj == null || obj is ValueType || obj is string)
+            {
+                WriteValue(obj, tw, false);
+                return;
+            }
+            else if (obj is IEnumerable)
+            {
+                IEnumerable collection = obj as IEnumerable;
+                foreach (object item in collection)
+                {
+                    NewLine(tw);
+                    Dump(item, tw, currentDepth);                    
+                }                
+                return;
+            }
+
+
             NewLine(tw);
             WriteText("{", currentDepth, tw);
             NewLine(tw);
@@ -155,9 +172,9 @@ namespace Logger
             tw.Write(text);
         }
 
-        private static void WriteValue(object value, TextWriter tw)
-        {
-            string v = value == null ? "null" : $"[{value.ToString()}]";
+        private static void WriteValue(object value, TextWriter tw, bool useValueMarkup = true)
+        {            
+            string v = value == null ? "null" : useValueMarkup ? $"[{value.ToString()}]" : value.ToString();
 
             WriteText(v, 1, tw);
         }
