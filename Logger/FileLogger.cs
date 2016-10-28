@@ -21,7 +21,7 @@ namespace Logger
         {
             FileInfo fileInfo = new FileInfo(Settings.FilePath);
             if (fileInfo.Exists && fileInfo.Length > Settings.GetMaxSizeBytes())
-                DeleteLogFile();                        
+                DeleteLogFile();
 
             using (FileStream file = new FileStream(fileInfo.FullName, FileMode.Append, FileAccess.Write, FileShare.Read))
             {
@@ -45,7 +45,7 @@ namespace Logger
         {
             producer.Add($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")} :: {message}{Environment.NewLine}{"-".PadRight(40, '-')} {Environment.NewLine}");
         }
-    
+
         public static void WriteLine(object[] parameters, bool onItemOneRow = false)
         {
             StringBuilder sb = new StringBuilder();
@@ -75,12 +75,12 @@ namespace Logger
 
         public static void WriteLine(object obj)
         {
-            WriteLine(ObjectDumper.Write(obj));            
+            WriteLine(ObjectDumper.Write(obj));
         }
 
         public static void WriteLine(Exception e)
-        {            
+        {
             WriteLine(ExceptionHelper.CreateString(e));
-        }    
+        }
     }
 }

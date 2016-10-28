@@ -34,11 +34,13 @@ namespace Logger
         {
             int textTabs = currentDepth + 1;
 
+            // SPECIAL CASE - primitive types: nulls, strings, numbers, characters...
             if (obj == null || obj is ValueType || obj is string)
             {
                 WriteValue(obj, tw, false);
                 return;
             }
+            //SPECIAL CASE - Lists, arrays...
             else if (obj is IEnumerable)
             {
                 IEnumerable collection = obj as IEnumerable;
@@ -96,8 +98,7 @@ namespace Logger
                             }
                         }
                         else
-                        {
-                                                       
+                        {                                                       
                             WriteName(cm, textTabs, tw);
                             if (value == null)
                             {
@@ -114,7 +115,6 @@ namespace Logger
                             NewLine(tw);
                     }
                 }
-
             }
 
             NewLine(tw);

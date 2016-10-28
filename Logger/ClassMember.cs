@@ -42,9 +42,11 @@ namespace Logger
                 value = fieldInfo.GetValue(obj);
             }
             else if (propertyInfo != null)
-            {                
-                if (propertyInfo.GetGetMethod(true) != null)
+            {
+                if (propertyInfo.GetGetMethod(false) != null && propertyInfo.DeclaringType.IsGenericParameter)
+                {                    
                     value = propertyInfo.GetValue(obj, null);
+                }
             }
             
             return value;
