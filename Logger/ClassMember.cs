@@ -36,7 +36,17 @@ namespace Logger
 
         internal object GetValue(object obj)
         {
-            var value = fieldInfo != null ? fieldInfo.GetValue(obj) : propertyInfo.GetValue(obj, null);
+            object value = null;
+            if (fieldInfo != null)
+            {
+                value = fieldInfo.GetValue(obj);
+            }
+            else if (propertyInfo != null)
+            {                
+                if (propertyInfo.GetGetMethod(true) != null)
+                    value = propertyInfo.GetValue(obj, null);
+            }
+            
             return value;
         }
 

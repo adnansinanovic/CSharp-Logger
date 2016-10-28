@@ -17,7 +17,7 @@ namespace Logger.Example
 
         public List<Animal> Lions { get; set; }
 
-        public Car car;
+        public Car Car;
 
         public int Age;
 
@@ -52,6 +52,10 @@ namespace Logger.Example
         public int PublicField;
 
         public int? kiotnja = null;
+
+        public int RetrievePrivateField { get { return PrivateField; } }
+
+        public int SetPrivateField { set { PrivateField = value; } }
 
     }
 }

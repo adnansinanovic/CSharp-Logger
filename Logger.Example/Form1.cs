@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,9 +24,9 @@ namespace Logger.Example
             he.LastName = "Larsson";
             he.Age = 5;
 
-            he.car = new Car();
-            he.car.Window = new CarPart() { Price = 154.2 };
-            he.car.Wheel = new CarPart() { Price = 589.2 };
+            he.Car = new Car();
+            he.Car.Window = new CarPart() { Price = 154.2 };
+            he.Car.Wheel = new CarPart() { Price = 589.2 };
 
             
             FileLogger.DeleteLogFile();
@@ -66,6 +67,19 @@ namespace Logger.Example
             FileLogger.Write(1234, he, nullValue, "Kurin", new List<string>() { "jen", "dva", "tri"});
 
             FileLogger.Write("Example: ", 458);
+
+
+            string urlBuilder = @"http://www.mapquestapi.com/directions/v2/route?key=Gmjtd%7Cluu22h62nq%2Cra%3Do5-lzand&ambiguities=ignore&outFormat=xml&avoidTimedConditions=false&doReverseGeocode=false&timeType=0&narrativeType=none&enhancedNarrative=false&shapeFormat=raw&generalize=0&generalize=0&locale=en_US&unit=m&routeType=shortest&from=20415+Anza+Ave+Apt+1,Torrrance,CA+90503&to=20+Anza+Ave+Apt+1,Torrrance,CA+90503";
+
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBuilder.ToString());
+            request.Referer = "drek";
+            request.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
+            request.Method = "GET";
+            request.UseDefaultCredentials = true;
+            request.Proxy.Credentials = System.Net.CredentialCache.DefaultCredentials;
+
+          //  FileLogger.Write(request);
         }        
     }
 }
