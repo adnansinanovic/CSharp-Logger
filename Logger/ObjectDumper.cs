@@ -32,6 +32,17 @@ namespace Logger
 
         private static void Dump(object obj, TextWriter tw, int currentDepth)
         {
+            // SPECIAL CASE - formatter is available
+            if (obj != null)
+            {
+                IDumpFormatter formatter = Settings.GetFormatter(obj.GetType());
+                if (formatter != null)
+                {
+                    tw.Write(formatter.Format(obj));
+                    return;
+                }
+            }
+
             int textTabs = currentDepth + 1;
 
             // SPECIAL CASE - primitive types: nulls, strings, numbers, characters...
@@ -47,8 +58,8 @@ namespace Logger
                 foreach (object item in collection)
                 {
                     NewLine(tw);
-                    Dump(item, tw, currentDepth);                    
-                }                
+                    Dump(item, tw, currentDepth);
+                }
                 return;
             }
 
@@ -81,7 +92,7 @@ namespace Logger
                             WriteValue(value, tw);
                         }
                         else if (cm.IsEnumerable())
-                        {                            
+                        {
                             WriteName(cm, textTabs, tw);
                             if (!InspectDeepness(tw, currentDepth))
                             {
@@ -98,7 +109,7 @@ namespace Logger
                             }
                         }
                         else
-                        {                                                       
+                        {
                             WriteName(cm, textTabs, tw);
                             if (value == null)
                             {
@@ -122,18 +133,18 @@ namespace Logger
             WriteText("}", currentDepth, tw);
         }
 
-       
+
 
         private static bool IgnoreElement(MemberInfo member)
         {
             if (Settings.WriteCompilerGeneratedTypes)
-                return false;                        
-            
+                return false;
+
             var result = member.GetCustomAttributes(typeof(CompilerGeneratedAttribute), true);
-          
+
             return result.Length != 0;
         }
-        
+
 
         private static bool InspectDeepness(TextWriter tw, int depth)
         {
@@ -160,7 +171,7 @@ namespace Logger
             {
                 string type = cm.GetClassMemberType().FullName;
                 WriteText($"{type} :: {name}= ", textTabs, tw);
-            }                   
+            }
             else
                 WriteText($"{name}= ", textTabs, tw);
 
@@ -173,7 +184,7 @@ namespace Logger
         }
 
         private static void WriteValue(object value, TextWriter tw, bool useValueMarkup = true)
-        {            
+        {
             string v = value == null ? "null" : useValueMarkup ? $"[{value.ToString()}]" : value.ToString();
 
             WriteText(v, 1, tw);

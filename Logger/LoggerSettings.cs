@@ -11,7 +11,7 @@ namespace Logger
         {
             FilePath = $"{AppDomain.CurrentDomain.FriendlyName}_DELETE_ME.log";
             MaxFileSizeMB = 5;
-        }
+        }      
 
         public int GetMaxSizeBytes()
         {

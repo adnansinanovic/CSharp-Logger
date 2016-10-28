@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Logger.Fomatters;
+using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Logger.Example
@@ -21,6 +23,7 @@ namespace Logger.Example
 
 
             FileLogger.DeleteLogFile();
+            ObjectDumper.Settings.AddFormatter(new DateTimeFormatter("yyyy-MM-dd HH:mm:ss.fffff "));
             FileLogger.Settings.MaxFileSizeMB = 3;            
 
             FileLogger.WriteLine("Who is it");
@@ -53,9 +56,22 @@ namespace Logger.Example
             FileLogger.Write(1234, he, nullValue, "Kurin", new List<string>() { "jen", "dva", "tri" });
 
             FileLogger.Write("Example: ", 458);
-            
 
             FileLogger.Write(new int[4]);
+            FileLogger.Write(DateTime.Now);
+
+
+            Planet planet = new Planet();
+            planet.Mass = 50;
+            planet.Name = "Green Planet";
+            planet.Population = 54789;
+            planet.Radius = 35;
+            planet.Sattelites = 2;
+
+            FileLogger.WriteLine($"Planet without formatter", planet);
+            ObjectDumper.Settings.AddFormatter(new PlanetFormatter());
+            FileLogger.WriteLine($"Planet with ormatter", planet);
+
         }
     }
 }
