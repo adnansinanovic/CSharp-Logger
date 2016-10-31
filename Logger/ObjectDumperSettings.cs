@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Logger
 {
@@ -12,6 +13,7 @@ namespace Logger
             WriteCompilerGeneratedTypes = false;
             MaxDepth = 4;
             WriteElementType = false;
+            BindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
         }
 
         /// <summary>
@@ -25,6 +27,8 @@ namespace Logger
         public int MaxDepth { get; set; }
 
         public bool WriteElementType { get; set; }
+
+        public BindingFlags BindingFlags { get; set; }
 
         public void AddFormatter(IDumpFormatter formatter)
         {
@@ -42,6 +46,5 @@ namespace Logger
         {
             return _formatters.Remove(formatterType);
         }
-
     }
 }

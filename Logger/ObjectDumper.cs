@@ -8,7 +8,6 @@ namespace Logger
 {
     public static class ObjectDumper
     {
-
         public static ObjectDumperSettings Settings;
 
         static ObjectDumper()
@@ -43,13 +42,10 @@ namespace Logger
                 }
             }
 
-            int textTabs = currentDepth + 1;
-
             // SPECIAL CASE - primitive types: nulls, strings, numbers, characters...
             if (obj == null || obj is ValueType || obj is string)
             {
-                WriteValue(obj, tw, false);
-                return;
+                WriteValue(obj, tw);
             }
             //SPECIAL CASE - Lists, arrays...
             else if (obj is IEnumerable)
@@ -60,10 +56,16 @@ namespace Logger
                     NewLine(tw);
                     Dump(item, tw, currentDepth);
                 }
-                return;
             }
+            else
+            {
+                ObjectDump(obj, tw, currentDepth);
+            }            
+        }
 
-
+        private static void ObjectDump(object obj, TextWriter tw, int currentDepth)
+        {
+            int textTabs = currentDepth + 1;
             NewLine(tw);
             WriteText("{", currentDepth, tw);
             NewLine(tw);
@@ -74,7 +76,7 @@ namespace Logger
             }
             else
             {
-                MemberInfo[] members = obj.GetType().GetMembers(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                MemberInfo[] members = obj.GetType().GetMembers(Settings.BindingFlags);
                 for (int i = 0; i < members.Length; i++)
                 {
                     MemberInfo member = members[i];
@@ -94,7 +96,7 @@ namespace Logger
                         else if (cm.IsEnumerable())
                         {
                             WriteName(cm, textTabs, tw);
-                            if (!InspectDeepness(tw, currentDepth))
+                            if (!InspectDeepness(cm, tw, currentDepth))
                             {
                                 IEnumerable enumerable = value as IEnumerable;
                                 if (enumerable == null)
@@ -117,7 +119,7 @@ namespace Logger
                             }
                             else
                             {
-                                if (!InspectDeepness(tw, currentDepth))
+                                if (!InspectDeepness(cm, tw, currentDepth))
                                     Dump(value, tw, currentDepth + 1);
                             }
                         }
@@ -134,7 +136,6 @@ namespace Logger
         }
 
 
-
         private static bool IgnoreElement(MemberInfo member)
         {
             if (Settings.WriteCompilerGeneratedTypes)
@@ -145,12 +146,11 @@ namespace Logger
             return result.Length != 0;
         }
 
-
-        private static bool InspectDeepness(TextWriter tw, int depth)
+        private static bool InspectDeepness(ClassMember cm, TextWriter tw, int depth)
         {
             if (depth >= Settings.MaxDepth)
             {
-                WriteText($"...............!!! TOO DEEP, DEPTH: {depth}/{Settings.MaxDepth} !!!..............", 1, tw);
+                WriteText(string.Format("{0}{1}{2}", "{", cm.GetClassMemberType().ToString(), "}"), 0, tw);                
                 return true;
             }
 
@@ -170,11 +170,10 @@ namespace Logger
             if (Settings.WriteElementType)
             {
                 string type = cm.GetClassMemberType().FullName;
-                WriteText($"{type} :: {name}= ", textTabs, tw);
+                WriteText($"{type}.{name} = ", textTabs, tw);
             }
             else
-                WriteText($"{name}= ", textTabs, tw);
-
+                WriteText($"{name} = ", textTabs, tw);
         }
 
         private static void WriteText(string text, int tabs, TextWriter tw)
@@ -183,11 +182,13 @@ namespace Logger
             tw.Write(text);
         }
 
-        private static void WriteValue(object value, TextWriter tw, bool useValueMarkup = true)
+        private static void WriteValue(object value, TextWriter tw)
         {
-            string v = value == null ? "null" : useValueMarkup ? $"[{value.ToString()}]" : value.ToString();
+            bool isString = (value is string);
 
-            WriteText(v, 1, tw);
+            string v = value == null ? "null" : isString ? $"\"{value.ToString()}\"" : value.ToString();
+
+            WriteText(v, 0, tw);
         }
     }
 }

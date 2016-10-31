@@ -13,10 +13,9 @@ namespace Logger
         static FileLogger()
         {
             Settings = new LoggerSettings();
-            //Settings.AddFormatter(new DateTimeFormatter());
 
-            producer = new ProducerConsumer<string>($"{AppDomain.CurrentDomain.FriendlyName}.logger");
-            producer.ItemProcessed += Producer_ItemProcessed;            
+            producer = new ProducerConsumer<string>();
+            producer.ItemProcessed += Producer_ItemProcessed;
         }
 
         private static void Producer_ItemProcessed(string message)
@@ -33,7 +32,7 @@ namespace Logger
                 }
             }
         }
-        
+
 
         public static void DeleteLogFile()
         {
@@ -84,6 +83,6 @@ namespace Logger
         public static void WriteLine(Exception e)
         {
             WriteLine(ExceptionHelper.CreateString(e));
-        }
+        }    
     }
 }

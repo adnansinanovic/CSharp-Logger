@@ -12,14 +12,14 @@ namespace Logger
         private readonly Thread _thread;
         private bool _running;
 
-        public ProducerConsumer(string name)
+        public ProducerConsumer()
         {
             _lock = new object();
             _items = new Queue<ProducerConsumerItem<T>>();
 
             _resetEvent = new ManualResetEvent(false);
             _thread = new Thread(Worker);
-            _thread.Name = name;
+            _thread.Name = $"{AppDomain.CurrentDomain.FriendlyName}.logger";
             _thread.IsBackground = true;
             _thread.Start();
         }

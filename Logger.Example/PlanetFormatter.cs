@@ -25,7 +25,7 @@ namespace Logger.Example
             if (planet == null)
                 return value.ToString();
 
-            return $"There was one planet, named {planet.Name}. Mass of planet was {planet.Mass}, and radius={planet.Radius}";
+            return $"There was one planet, named {planet.GetName}. Mass of planet was {planet.Mass}, and radius={planet.Radius}";
 
         }
     }

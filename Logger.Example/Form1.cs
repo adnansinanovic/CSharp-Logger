@@ -1,6 +1,7 @@
 ﻿using Logger.Fomatters;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Windows.Forms;
 
 namespace Logger.Example
@@ -24,7 +25,10 @@ namespace Logger.Example
 
             FileLogger.DeleteLogFile();
             ObjectDumper.Settings.AddFormatter(new DateTimeFormatter("yyyy-MM-dd HH:mm:ss.fffff "));
+            ObjectDumper.Settings.WriteElementType = true;
+            ObjectDumper.Settings.MaxDepth = 4;
             FileLogger.Settings.MaxFileSizeMB = 3;            
+            
 
             FileLogger.WriteLine("Who is it");
             FileLogger.WriteLine("What do you want");
@@ -63,7 +67,7 @@ namespace Logger.Example
 
             Planet planet = new Planet();
             planet.Mass = 50;
-            planet.Name = "Green Planet";
+            planet.SetName = "Green Planet";
             planet.Population = 54789;
             planet.Radius = 35;
             planet.Sattelites = 2;
@@ -72,6 +76,12 @@ namespace Logger.Example
             ObjectDumper.Settings.AddFormatter(new PlanetFormatter());
             FileLogger.WriteLine($"Planet with ormatter", planet);
 
+
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create("http://www.google.com");
+            httpWebRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
+            httpWebRequest.Method = "GET";
+
+            FileLogger.WriteLine(httpWebRequest);            
         }
     }
 }
