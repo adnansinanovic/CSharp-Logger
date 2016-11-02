@@ -25,8 +25,8 @@ namespace Logger.Example
 
             FileLogger.Settings.FilePath = @"C:\Folder\LogFile.log";
             FileLogger.DeleteLogFile();
-            ObjectDumper.Settings.AddFormatter(new DateTimeFormatter("yyyy-MM-dd HH:mm:ss.fffff "));
-            ObjectDumper.Settings.WriteElementType = true;
+            ObjectDumper.Settings.AddFormatter(new DateTimeFormatter("yyyy-MM-dd HH:mm:ss.fffff"));
+            ObjectDumper.Settings.WriteElementType = false;
             ObjectDumper.Settings.MaxDepth = 6;
             FileLogger.Settings.MaxFileSizeMB = 3;            
             

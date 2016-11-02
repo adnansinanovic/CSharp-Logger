@@ -51,13 +51,13 @@ namespace Logger
         public static void WriteLine(object[] parameters, bool onItemOneRow = false)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (object mesagge in parameters)
+            for (int i=0; i<parameters.Length; i++)            
             {
-                string dump = ObjectDumper.Write(mesagge);
+                string dump = ObjectDumper.Write(parameters[i]);
                 sb.Append($"{dump}");
 
-                if (onItemOneRow)
-                    sb.Append(Environment.NewLine);
+                if (onItemOneRow && i + 1 < parameters.Length)               
+                    sb.Append(Environment.NewLine);               
             }
 
             WriteLine(sb.ToString());

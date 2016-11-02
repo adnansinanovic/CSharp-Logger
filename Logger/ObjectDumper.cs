@@ -65,6 +65,13 @@ namespace Logger
 
         private static void ObjectDump(object obj, TextWriter tw, int currentDepth)
         {
+            Type type = obj.GetType();
+            if (type.FullName.Equals($"System.{type.Name}", StringComparison.Ordinal))
+                return;
+
+            if (type.FullName.Equals($"System.Reflection.{type.Name}", StringComparison.Ordinal))
+                return;           
+
             int textTabs = currentDepth + 1;
             NewLine(tw);
             WriteText("{", currentDepth, tw);
@@ -75,17 +82,7 @@ namespace Logger
                 WriteValue(obj, tw);
             }
             else
-            {
-                Type type = obj.GetType();                
-                if (type.FullName.Equals($"System.{type.Name}", StringComparison.Ordinal))
-                    return;
-
-                if (type.FullName.Equals($"System.Reflection.{type.Name}"))
-                    return;
-
-                if (obj is System.Security.Principal.SecurityIdentifier)
-                    return;
-
+            {               
                 MemberInfo[] members = type.GetMembers(Settings.BindingFlags);
                 for (int i = 0; i < members.Length; i++)
                 {
@@ -140,7 +137,7 @@ namespace Logger
                 }
             }
 
-            NewLine(tw);
+            //NewLine(tw);
 
             WriteText("}", currentDepth, tw);
         }
