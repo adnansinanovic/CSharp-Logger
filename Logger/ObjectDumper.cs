@@ -60,7 +60,7 @@ namespace Logger
             else
             {
                 ObjectDump(obj, tw, currentDepth);
-            }            
+            }
         }
 
         private static void ObjectDump(object obj, TextWriter tw, int currentDepth)
@@ -76,12 +76,22 @@ namespace Logger
             }
             else
             {
-                MemberInfo[] members = obj.GetType().GetMembers(Settings.BindingFlags);
+                Type type = obj.GetType();                
+                if (type.FullName.Equals($"System.{type.Name}", StringComparison.Ordinal))
+                    return;
+
+                if (type.FullName.Equals($"System.Reflection.{type.Name}"))
+                    return;
+
+                if (obj is System.Security.Principal.SecurityIdentifier)
+                    return;
+
+                MemberInfo[] members = type.GetMembers(Settings.BindingFlags);
                 for (int i = 0; i < members.Length; i++)
                 {
                     MemberInfo member = members[i];
 
-                    if (IgnoreElement(member))
+                    if (IgnoreCompilerGeneratedMember(member))
                         continue;
 
                     ClassMember cm = new ClassMember(member);
@@ -136,8 +146,8 @@ namespace Logger
         }
 
 
-        private static bool IgnoreElement(MemberInfo member)
-        {
+        private static bool IgnoreCompilerGeneratedMember(MemberInfo member)
+        {            
             if (Settings.WriteCompilerGeneratedTypes)
                 return false;
 
@@ -150,7 +160,7 @@ namespace Logger
         {
             if (depth >= Settings.MaxDepth)
             {
-                WriteText(string.Format("{0}{1}{2}", "{", cm.GetClassMemberType().ToString(), "}"), 0, tw);                
+                WriteText(string.Format("{0}{1}{2}", "{", cm.GetClassMemberType().ToString(), "}"), 0, tw);
                 return true;
             }
 

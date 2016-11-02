@@ -16,17 +16,18 @@ namespace Logger.Example
             Person he = new Person();
             he.Name = "Henrik";
             he.LastName = "Larsson";
-            he.Age = 5;
+            he.Age = 6;
 
             he.Car = new Car();
             he.Car.Window = new CarPart() { Price = 154.2 };
             he.Car.Wheel = new CarPart() { Price = 589.2 };
 
 
+            FileLogger.Settings.FilePath = @"C:\Folder\LogFile.log";
             FileLogger.DeleteLogFile();
             ObjectDumper.Settings.AddFormatter(new DateTimeFormatter("yyyy-MM-dd HH:mm:ss.fffff "));
             ObjectDumper.Settings.WriteElementType = true;
-            ObjectDumper.Settings.MaxDepth = 4;
+            ObjectDumper.Settings.MaxDepth = 6;
             FileLogger.Settings.MaxFileSizeMB = 3;            
             
 

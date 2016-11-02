@@ -45,25 +45,7 @@ namespace Logger
             {
                 var getMethod = propertyInfo.GetGetMethod(false);
                 if (getMethod != null)
-                {
-
-                    try
-                    {
-                        value = propertyInfo.GetValue(obj, null);
-                    }
-                    catch (TargetInvocationException ex)
-                    {     
-                        //TODO find way to fix this                   
-                        if (propertyInfo.DeclaringType.IsGenericParameter)
-                        {                                                                                    
-                            if (propertyInfo.DeclaringType.IsGenericParameter)
-                                value = propertyInfo.GetValue(obj, null);
-                        }
-
-                    }
-
-
-                }
+                    value = propertyInfo.GetValue(obj, null);
             }
 
             return value;
@@ -83,6 +65,6 @@ namespace Logger
         public Type GetClassMemberType()
         {
             return fieldInfo != null ? fieldInfo.FieldType : propertyInfo.PropertyType;
-        }        
+        }
     }
 }
