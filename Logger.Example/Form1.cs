@@ -82,7 +82,34 @@ namespace Logger.Example
             httpWebRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
             httpWebRequest.Method = "GET";
 
-            FileLogger.WriteLine(httpWebRequest);            
+            FileLogger.WriteLine(httpWebRequest);
+
+
+
+            try
+            {
+                try
+                {
+                    try
+                    {
+                        throw new Exception("Hi. I am inner exception.");
+                            
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Hi. I'm exception 2.", ex);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Hi. I'm exception 3.", ex);
+                }
+                
+            }
+            catch (Exception e)
+            {
+                FileLogger.WriteLine(e, "Exception TITLE");
+            }   
         }
     }
 }

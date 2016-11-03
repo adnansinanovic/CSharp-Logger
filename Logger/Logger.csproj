@@ -45,6 +45,7 @@
     <Compile Include="ClassMember.cs" />
     <Compile Include="Fomatters\DateTimeFormatter.cs" />
     <Compile Include="Fomatters\IDumpFormatter.cs" />
+    <Compile Include="LogItem.cs" />
     <Compile Include="ObjectDumper.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="FileLogger.cs" />

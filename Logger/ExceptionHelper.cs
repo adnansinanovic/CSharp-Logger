@@ -14,6 +14,9 @@ namespace Logger
                 sb.AppendLine(e.StackTrace);
                 sb.AppendLine(e.Source);
                 e = e.InnerException;
+
+                if (e != null)
+                    sb.AppendLine();
             }
             return sb.ToString();
         }

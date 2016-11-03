@@ -1,26 +1,29 @@
-﻿using Logger;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace Logger
 {
     public class FileLogger
     {
-        private static ProducerConsumer<string> producer;
+        private static ProducerConsumer<LogItem> producer;
         public static LoggerSettings Settings { get; set; }
 
         static FileLogger()
         {
             Settings = new LoggerSettings();
 
-            producer = new ProducerConsumer<string>();
+            producer = new ProducerConsumer<LogItem>();
             producer.ItemProcessed += Producer_ItemProcessed;
         }
 
-        private static void Producer_ItemProcessed(string message)
-        {
-            FileInfo fileInfo = new FileInfo(Settings.FilePath);
+        private static void Producer_ItemProcessed(LogItem logItem)
+        {            
+            FileInfo tempFileInfo = new FileInfo(Settings.FilePath);
+            string path = $"{Settings.FilePath.Replace(tempFileInfo.Extension, logItem.FileSuffix)}{tempFileInfo.Extension}";            
+
+            FileInfo fileInfo = new FileInfo(path);
             if (fileInfo.Exists && fileInfo.Length > Settings.GetMaxSizeBytes())
                 DeleteLogFile();
 
@@ -28,11 +31,10 @@ namespace Logger
             {
                 using (StreamWriter writer = new StreamWriter(file, Encoding.Unicode))
                 {
-                    writer.Write(message);
+                    writer.Write(logItem.Message);
                 }
             }
         }
-
 
         public static void DeleteLogFile()
         {
@@ -45,7 +47,13 @@ namespace Logger
 
         private static void WriteLine(string message)
         {
-            producer.Add($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")} :: {message}{Environment.NewLine}{"-".PadRight(40, '-')} {Environment.NewLine}");
+            LogItem item = new LogItem();
+
+            item.Message = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")} :: {message}{Environment.NewLine}{"-".PadRight(40, '-')} {Environment.NewLine}";
+
+            item.FileSuffix = Settings.FilePerThread ? Thread.CurrentThread.ManagedThreadId.ToString() : string.Empty;
+
+            producer.Add(item);
         }
 
         public static void WriteLine(object[] parameters, bool onItemOneRow = false)
@@ -80,9 +88,9 @@ namespace Logger
             WriteLine(ObjectDumper.Write(obj));
         }
 
-        public static void WriteLine(Exception e)
+        public static void WriteLine(Exception e, string prefix = "")
         {
-            WriteLine(ExceptionHelper.CreateString(e));
+            WriteLine($"{prefix}{Environment.NewLine}{ExceptionHelper.CreateString(e)}");
         }    
     }
 }
