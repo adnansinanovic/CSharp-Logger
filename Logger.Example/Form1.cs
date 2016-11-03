@@ -84,15 +84,13 @@ namespace Logger.Example
 
             FileLogger.WriteLine(httpWebRequest);
 
-
-
             try
             {
                 try
                 {
                     try
                     {
-                        throw new Exception("Hi. I am inner exception.");
+                        throw new Exception("Hi. I am exception.");
                             
                     }
                     catch (Exception ex)

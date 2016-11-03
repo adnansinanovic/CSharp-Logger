@@ -6,20 +6,20 @@ namespace Logger
 {
     internal class ClassMember
     {
-        FieldInfo fieldInfo;
-        PropertyInfo propertyInfo;
-        MemberInfo memberInfo;
+        FieldInfo _fieldInfo;
+        PropertyInfo _propertyInfo;
+        MemberInfo _memberInfo;
 
         public ClassMember(MemberInfo memberInfo)
         {
-            fieldInfo = memberInfo as FieldInfo;
-            propertyInfo = memberInfo as PropertyInfo;
-            this.memberInfo = memberInfo;
+            _fieldInfo = memberInfo as FieldInfo;
+            _propertyInfo = memberInfo as PropertyInfo;
+            _memberInfo = memberInfo;
         }
 
         internal bool IsValid()
         {
-            return fieldInfo != null || propertyInfo != null;
+            return _fieldInfo != null || _propertyInfo != null;
         }
 
         internal bool IsValueType()
@@ -37,15 +37,15 @@ namespace Logger
         internal object GetValue(object obj)
         {
             object value = null;
-            if (fieldInfo != null)
+            if (_fieldInfo != null)
             {
-                value = fieldInfo.GetValue(obj);
+                value = _fieldInfo.GetValue(obj);
             }
-            else if (propertyInfo != null)
+            else if (_propertyInfo != null)
             {
-                var getMethod = propertyInfo.GetGetMethod(false);
+                var getMethod = _propertyInfo.GetGetMethod(false);
                 if (getMethod != null)
-                    value = propertyInfo.GetValue(obj, null);
+                    value = _propertyInfo.GetValue(obj, null);
             }
 
             return value;
@@ -53,7 +53,7 @@ namespace Logger
 
         internal string GetName()
         {
-            return memberInfo.Name;
+            return _memberInfo.Name;
         }
 
         internal bool IsEnumerable()
@@ -64,7 +64,7 @@ namespace Logger
 
         public Type GetClassMemberType()
         {
-            return fieldInfo != null ? fieldInfo.FieldType : propertyInfo.PropertyType;
+            return _fieldInfo != null ? _fieldInfo.FieldType : _propertyInfo.PropertyType;
         }
     }
 }
