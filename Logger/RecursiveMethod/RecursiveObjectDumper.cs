@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logger.Fomatters;
+using System;
 using System.Collections;
 using System.IO;
 using System.Reflection;
@@ -6,30 +7,23 @@ using System.Runtime.CompilerServices;
 
 namespace Logger
 {
-    public static class ObjectDumper
+    public class RecursiveObjectDumper : IObjectDumper
     {
-        public static ObjectDumperSettings Settings;
+        public ObjectDumperSettings Settings { get; set; }
+        private InternalObjectFormatter _formatter;
 
-        static ObjectDumper()
+        public RecursiveObjectDumper()
         {
+            _formatter = new InternalObjectFormatter();
             Settings = new ObjectDumperSettings();
         }
 
-        public static string Write(object obj)
-        {
-            string result = string.Empty;
-            using (TextWriter tw = new StringWriter())
-            {
-                Dump(obj, tw, 0);
-                result = tw.ToString();
-
-                tw.Flush();
-            }
-
-            return result;
+        public void Dump(object obj, TextWriter tw)
+        {            
+            Dump(obj, tw, 0);                                      
         }
 
-        private static void Dump(object obj, TextWriter tw, int currentDepth)
+        private void Dump(object obj, TextWriter tw, int currentDepth)
         {
             // SPECIAL CASE - formatter is available
             if (obj != null)
@@ -45,7 +39,7 @@ namespace Logger
             // SPECIAL CASE - primitive types: nulls, strings, numbers, characters...
             if (obj == null || obj is ValueType || obj is string)
             {
-                WriteValue(obj, tw);
+                _formatter.WriteValue(obj, tw);
             }
             //SPECIAL CASE - Lists, arrays...
             else if (obj is IEnumerable)
@@ -53,7 +47,7 @@ namespace Logger
                 IEnumerable collection = obj as IEnumerable;
                 foreach (object item in collection)
                 {
-                    NewLine(tw);
+                    _formatter.NewLine(tw);
                     Dump(item, tw, currentDepth);
                 }
             }
@@ -63,7 +57,7 @@ namespace Logger
             }
         }
 
-        private static void ObjectDump(object obj, TextWriter tw, int currentDepth)
+        private void ObjectDump(object obj, TextWriter tw, int currentDepth)
         {
             Type type = obj.GetType();
             if (type.FullName.Equals($"System.{type.Name}", StringComparison.Ordinal))
@@ -73,13 +67,13 @@ namespace Logger
                 return;           
 
             int textTabs = currentDepth + 1;
-            NewLine(tw);
-            WriteText("{", currentDepth, tw);
-            NewLine(tw);
+            _formatter.NewLine(tw);
+            _formatter.WriteText("{", currentDepth, tw);
+            _formatter.NewLine(tw);
 
             if (obj == null || obj is ValueType || obj is string)
             {
-                WriteValue(obj, tw);
+                _formatter.WriteValue(obj, tw);
             }
             else
             {               
@@ -97,18 +91,18 @@ namespace Logger
                         object value = cm.GetValue(obj);
                         if (cm.IsValueType() || cm.IsString())
                         {
-                            WriteName(cm, textTabs, tw);
-                            WriteValue(value, tw);
+                            _formatter.WriteName(cm.GetNames(), textTabs, tw, Settings.WriteElementType);
+                            _formatter.WriteValue(value, tw);
                         }
                         else if (cm.IsEnumerable())
                         {
-                            WriteName(cm, textTabs, tw);
+                            _formatter.WriteName(cm.GetNames(), textTabs, tw, Settings.WriteElementType);
                             if (!InspectDeepness(cm, tw, currentDepth))
                             {
                                 IEnumerable enumerable = value as IEnumerable;
                                 if (enumerable == null)
                                 {
-                                    WriteValue(enumerable, tw);
+                                    _formatter.WriteValue(enumerable, tw);
                                 }
                                 else
                                 {
@@ -119,10 +113,10 @@ namespace Logger
                         }
                         else
                         {
-                            WriteName(cm, textTabs, tw);
+                            _formatter.WriteName(cm.GetNames(), textTabs, tw, Settings.WriteElementType);
                             if (value == null)
                             {
-                                WriteValue(value, tw);
+                                _formatter.WriteValue(value, tw);
                             }
                             else
                             {
@@ -132,18 +126,18 @@ namespace Logger
                         }
 
                         if (i + 1 < members.Length)
-                            NewLine(tw);
+                            _formatter.NewLine(tw);
                     }
                 }
             }
 
-            //NewLine(tw);
+            _formatter.NewLine(tw);
 
-            WriteText("}", currentDepth, tw);
+            _formatter.WriteText("}", currentDepth, tw);
         }
 
 
-        private static bool IgnoreCompilerGeneratedMember(MemberInfo member)
+        private bool IgnoreCompilerGeneratedMember(MemberInfo member)
         {            
             if (Settings.WriteCompilerGeneratedTypes)
                 return false;
@@ -153,49 +147,15 @@ namespace Logger
             return result.Length != 0;
         }
 
-        private static bool InspectDeepness(ClassMember cm, TextWriter tw, int depth)
+        private bool InspectDeepness(ClassMember cm, TextWriter tw, int depth)
         {
             if (depth >= Settings.MaxDepth)
             {
-                WriteText(string.Format("{0}{1}{2}", "{", cm.GetClassMemberType().ToString(), "}"), 0, tw);
+                _formatter.WriteText(string.Format("{0}{1}{2}", "{", cm.GetClassMemberType().ToString(), "}"), 0, tw);
                 return true;
             }
 
             return false;
-
-        }
-
-        private static void NewLine(TextWriter tw)
-        {
-            tw.WriteLine();
-        }
-
-        private static void WriteName(ClassMember cm, int textTabs, TextWriter tw)
-        {
-            string name = cm.GetName().ToString();
-
-            if (Settings.WriteElementType)
-            {
-                string type = cm.GetClassMemberType().FullName;
-                WriteText($"{type}.{name} = ", textTabs, tw);
-            }
-            else
-                WriteText($"{name} = ", textTabs, tw);
-        }
-
-        private static void WriteText(string text, int tabs, TextWriter tw)
-        {
-            tw.Write(string.Empty.PadRight(tabs, '\t'));
-            tw.Write(text);
-        }
-
-        private static void WriteValue(object value, TextWriter tw)
-        {
-            bool isString = (value is string);
-
-            string v = value == null ? "null" : isString ? $"\"{value.ToString()}\"" : value.ToString();
-
-            WriteText(v, 0, tw);
-        }
+        }      
     }
 }

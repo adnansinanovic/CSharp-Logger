@@ -10,18 +10,39 @@ namespace Logger
         private static ProducerConsumer<LogItem> producer;
         public static LoggerSettings Settings { get; set; }
 
+        public static ObjectDumperSettings DumperSettings { get { return _dumper.Settings; } set { _dumper.Settings = value; } }
+
+        private static IObjectDumper _dumper;
+
         static FileLogger()
         {
-            Settings = new LoggerSettings();
+            SetDumpMethod(ObjectDumpMethod.Traverse);
+
+            Settings = new LoggerSettings();            
 
             producer = new ProducerConsumer<LogItem>();
             producer.ItemProcessed += Producer_ItemProcessed;
         }
 
+        public static void SetDumpMethod(ObjectDumpMethod method)
+        {
+            switch (method)
+            {
+                case ObjectDumpMethod.Recursive:
+                    _dumper = new RecursiveObjectDumper();
+                    break;
+                case ObjectDumpMethod.Traverse:
+                    _dumper = new TraversalObjectDumper();
+                    break;
+                default:
+                    throw new NotImplementedException(method.ToString());
+            }                        
+        }
+
         private static void Producer_ItemProcessed(LogItem logItem)
-        {            
+        {
             FileInfo tempFileInfo = new FileInfo(Settings.FilePath);
-            string path = $"{Settings.FilePath.Replace(tempFileInfo.Extension, logItem.FileSuffix)}{tempFileInfo.Extension}";            
+            string path = $"{Settings.FilePath.Replace(tempFileInfo.Extension, logItem.FileSuffix)}{tempFileInfo.Extension}";
 
             FileInfo fileInfo = new FileInfo(path);
             if (fileInfo.Exists && fileInfo.Length > Settings.GetMaxSizeBytes())
@@ -58,17 +79,19 @@ namespace Logger
 
         public static void WriteLine(object[] parameters, bool onItemOneRow = false)
         {
-            StringBuilder sb = new StringBuilder();
-            for (int i=0; i<parameters.Length; i++)            
+            using (TextWriter textWriter = new StringWriter())
             {
-                string dump = ObjectDumper.Write(parameters[i]);
-                sb.Append($"{dump}");
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    _dumper.Dump(parameters[i], textWriter);
 
-                if (onItemOneRow && i + 1 < parameters.Length)               
-                    sb.Append(Environment.NewLine);               
+                    if (onItemOneRow && i + 1 < parameters.Length)
+                        textWriter.WriteLine();
+                }
+
+                WriteLine(textWriter.ToString());
             }
 
-            WriteLine(sb.ToString());
         }
 
         public static void WriteLine(params object[] parameters)
@@ -85,12 +108,16 @@ namespace Logger
 
         public static void WriteLine(object obj)
         {
-            WriteLine(ObjectDumper.Write(obj));
+            using (TextWriter textWriter = new StringWriter())
+            {
+                _dumper.Dump(obj, textWriter);
+                WriteLine(textWriter.ToString());
+            }
         }
 
         public static void WriteLine(Exception e, string prefix = "")
         {
             WriteLine($"{prefix}{Environment.NewLine}{ExceptionHelper.CreateString(e)}");
-        }    
+        }
     }
 }

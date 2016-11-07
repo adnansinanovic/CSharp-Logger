@@ -56,6 +56,16 @@ namespace Logger
             return _memberInfo.Name;
         }
 
+        internal string GetFullName()
+        {
+            return $"{GetClassMemberType().FullName}.{GetName()}";            
+        }
+
+        internal NameContainer GetNames()
+        {
+            return new NameContainer(GetName(), GetFullName());
+        }
+
         internal bool IsEnumerable()
         {
             Type t = GetClassMemberType();

@@ -22,14 +22,17 @@ namespace Logger.Example
             he.Car.Window = new CarPart() { Price = 154.2 };
             he.Car.Wheel = new CarPart() { Price = 589.2 };
 
-
+            FileLogger.SetDumpMethod(ObjectDumpMethod.Traverse);
             FileLogger.Settings.FilePath = @"C:\Folder\LogFile.log";
             FileLogger.DeleteLogFile();
-            ObjectDumper.Settings.AddFormatter(new DateTimeFormatter("yyyy-MM-dd HH:mm:ss.fffff"));
-            ObjectDumper.Settings.WriteElementType = false;
-            ObjectDumper.Settings.MaxDepth = 6;
-            FileLogger.Settings.MaxFileSizeMB = 3;            
-            
+
+            FileLogger.DumperSettings.AddFormatter(new DateTimeFormatter("yyyy-MM-dd HH:mm:ss.fffff"));
+            FileLogger.DumperSettings.WriteElementType = false;
+            FileLogger.DumperSettings.MaxDepth = 6;
+            FileLogger.Settings.MaxFileSizeMB = 3;
+
+            FileLogger.WriteLine("Below is simple string list: ");
+            FileLogger.WriteLine(new List<string>() { "jen", "dva", "tri" });
 
             FileLogger.WriteLine("Who is it");
             FileLogger.WriteLine("What do you want");
@@ -38,9 +41,6 @@ namespace Logger.Example
             FileLogger.WriteLine("Below is double example: ");
             FileLogger.WriteLine(351.453);
             FileLogger.WriteLine((double)(10 / 3m));
-
-            FileLogger.WriteLine("Below is simple string list: ");
-            FileLogger.WriteLine(new List<string>() { "jen", "dva", "tri" });
 
             FileLogger.WriteLine("Below is list of lists of string: ");
             FileLogger.WriteLine(new List<List<string>>()
@@ -74,7 +74,7 @@ namespace Logger.Example
             planet.Sattelites = 2;
 
             FileLogger.WriteLine($"Planet without formatter", planet);
-            ObjectDumper.Settings.AddFormatter(new PlanetFormatter());
+            FileLogger.DumperSettings.AddFormatter(new PlanetFormatter());
             FileLogger.WriteLine($"Planet with ormatter", planet);
 
 
@@ -91,7 +91,7 @@ namespace Logger.Example
                     try
                     {
                         throw new Exception("Hi. I am exception.");
-                            
+
                     }
                     catch (Exception ex)
                     {
@@ -102,12 +102,14 @@ namespace Logger.Example
                 {
                     throw new Exception("Hi. I'm exception 3.", ex);
                 }
-                
+
             }
             catch (Exception e)
             {
                 FileLogger.WriteLine(e, "Exception TITLE");
-            }   
+            }
+
+            FileLogger.WriteLine(new P1());
         }
     }
 }

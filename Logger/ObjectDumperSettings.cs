@@ -45,6 +45,6 @@ namespace Logger
         public bool RemoveFormatter(Type formatterType)
         {
             return _formatters.Remove(formatterType);
-        }
+        }          
     }
 }

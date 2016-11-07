@@ -16,16 +16,16 @@ namespace Logger.Example
             }
         }
 
-        public string Format(object value)
+        public string Format(object value, int intendation)
         {
             if (value == null)
                 return "null";
 
             Planet planet = value as Planet;
             if (planet == null)
-                return value.ToString();
+                return $"{string.Empty.PadRight(intendation, '\t')}{value.ToString()}";
 
-            return $"There was one planet, named {planet.GetName}. Mass of planet was {planet.Mass}, and radius={planet.Radius}";
+            return $"{string.Empty.PadRight(intendation, '\t')}There was one planet, named {planet.GetName}. Mass of planet was {planet.Mass}, and radius={planet.Radius}";
 
         }
     }

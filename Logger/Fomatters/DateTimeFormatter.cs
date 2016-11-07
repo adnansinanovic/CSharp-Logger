@@ -24,16 +24,16 @@ namespace Logger.Fomatters
             }
         }
 
-        public string Format(object value)
+        public string Format(object value, int intendation)
         {
             if (value == null)
                 return "null";
 
             if (value is DateTime && !string.IsNullOrEmpty(DateFormat))
-                return ((DateTime)value).ToString(DateFormat);
+                return $"{string.Empty.PadRight(intendation, '\t')}{((DateTime)value).ToString(DateFormat)}";
 
 
-            return value.ToString();
+            return $"{string.Empty.PadRight(intendation, '\t')}{value.ToString()}";
         }
     }
 }

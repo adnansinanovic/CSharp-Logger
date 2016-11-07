@@ -45,8 +45,12 @@
     <Compile Include="ClassMember.cs" />
     <Compile Include="Fomatters\DateTimeFormatter.cs" />
     <Compile Include="Fomatters\IDumpFormatter.cs" />
+    <Compile Include="Fomatters\InternalObjectFormatter.cs" />
+    <Compile Include="IObjectDumper.cs" />
     <Compile Include="LogItem.cs" />
-    <Compile Include="ObjectDumper.cs" />
+    <Compile Include="NameContainer.cs" />
+    <Compile Include="ObjectDumpMethodEnum.cs" />
+    <Compile Include="RecursiveMethod\RecursiveObjectDumper.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="FileLogger.cs" />
     <Compile Include="LoggerSettings.cs" />
@@ -54,6 +58,9 @@
     <Compile Include="ProducerConsumer.cs" />
     <Compile Include="ProducerConsumerItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TraverseMethod\Sample.cs" />
+    <Compile Include="TraverseMethod\TraversalObjectDumper.cs" />
+    <Compile Include="TraverseMethod\TraverseNode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
