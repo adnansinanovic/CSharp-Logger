@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -29,13 +31,13 @@ namespace Logger
             switch (method)
             {
                 case ObjectDumpMethod.Recursive:
-                    _dumper = new RecursiveObjectDumper();
+                    _dumper = new RecursiveObjectDumper();                    
                     break;
-                case ObjectDumpMethod.Traverse:
+                case ObjectDumpMethod.Traverse:                    
                     _dumper = new TraversalObjectDumper();
                     break;
                 default:
-                    throw new NotImplementedException(method.ToString());
+                    throw new InvalidEnumArgumentException(method.ToString());
             }                        
         }
 
@@ -66,18 +68,29 @@ namespace Logger
             }
         }
 
-        private static void WriteLine(string message)
+        private static void FinalWrite(string message, bool multiline)
         {
             LogItem item = new LogItem();
 
-            item.Message = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")} :: {message}{Environment.NewLine}{"-".PadRight(40, '-')} {Environment.NewLine}";
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")}");            
+            sb.Append( multiline ? $"{Environment.NewLine}" : " :: ");
+            sb.AppendLine(message);
+            sb.Append($"{"-".PadRight(40, '-')}{Environment.NewLine}");
+            
+            item.Message = sb.ToString();
 
             item.FileSuffix = Settings.FilePerThread ? Thread.CurrentThread.ManagedThreadId.ToString() : string.Empty;
 
             producer.Add(item);
         }
 
-        public static void WriteLine(object[] parameters, bool onItemOneRow = false)
+        //public static void WriteLine(string message)
+        //{
+        //    FinalWrite(message, false);
+        //}
+
+        public static void WriteLine(object[] parameters, bool oneItemOneRow = false)
         {
             using (TextWriter textWriter = new StringWriter())
             {
@@ -85,13 +98,14 @@ namespace Logger
                 {
                     _dumper.Dump(parameters[i], textWriter);
 
-                    if (onItemOneRow && i + 1 < parameters.Length)
+                    if (oneItemOneRow && i + 1 < parameters.Length)
                         textWriter.WriteLine();
                 }
 
-                WriteLine(textWriter.ToString());
-            }
+                bool isMultiline = oneItemOneRow && (parameters.Length > 1 || (parameters.Length == 1 && parameters[0] is IEnumerable));
 
+                FinalWrite(textWriter.ToString(), isMultiline);
+            }
         }
 
         public static void WriteLine(params object[] parameters)
@@ -111,13 +125,16 @@ namespace Logger
             using (TextWriter textWriter = new StringWriter())
             {
                 _dumper.Dump(obj, textWriter);
-                WriteLine(textWriter.ToString());
+
+                bool isMultiline = (obj != null) && !(obj is ValueType) && !(obj is string);                            
+
+                FinalWrite(textWriter.ToString(), isMultiline);
             }
         }
 
         public static void WriteLine(Exception e, string prefix = "")
         {
-            WriteLine($"{prefix}{Environment.NewLine}{ExceptionHelper.CreateString(e)}");
+            FinalWrite($"{prefix}{Environment.NewLine}{ExceptionHelper.CreateString(e)}", true);
         }
     }
 }

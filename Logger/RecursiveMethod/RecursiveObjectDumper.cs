@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Logger
 {
+    [Obsolete]
     public class RecursiveObjectDumper : IObjectDumper
     {
         public ObjectDumperSettings Settings { get; set; }

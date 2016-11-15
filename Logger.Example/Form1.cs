@@ -1,6 +1,7 @@
 ﻿using Logger.Fomatters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Windows.Forms;
 
@@ -31,9 +32,6 @@ namespace Logger.Example
             FileLogger.DumperSettings.MaxDepth = 6;
             FileLogger.Settings.MaxFileSizeMB = 3;
 
-            FileLogger.WriteLine("Below is simple string list: ");
-            FileLogger.WriteLine(new List<string>() { "jen", "dva", "tri" });
-
             FileLogger.WriteLine("Who is it");
             FileLogger.WriteLine("What do you want");
             FileLogger.WriteLine("Below is integer example: ");
@@ -41,6 +39,9 @@ namespace Logger.Example
             FileLogger.WriteLine("Below is double example: ");
             FileLogger.WriteLine(351.453);
             FileLogger.WriteLine((double)(10 / 3m));
+
+            FileLogger.WriteLine("Below is simple string list: ");
+            FileLogger.WriteLine(new List<string>() { "jen", "dva", "tri" });
 
             FileLogger.WriteLine("Below is list of lists of string: ");
             FileLogger.WriteLine(new List<List<string>>()
@@ -54,13 +55,14 @@ namespace Logger.Example
             object nullValue = null;
             FileLogger.WriteLine(nullValue);
 
-            FileLogger.WriteLine("Below is object: ");
+            FileLogger.WriteLine("Below are parameters (string, object, string): ");
             FileLogger.WriteLine("Row first:", he, "Last row");
+            FileLogger.Write("Row first:", he, "Last row");
 
-            FileLogger.WriteLine("Below are parameters: ");
-            FileLogger.Write(1234, he, nullValue, "Kurin", new List<string>() { "jen", "dva", "tri" });
+            FileLogger.WriteLine("Below are parameters (int, object, null, string, list<string>): ");
+            FileLogger.WriteLine(1234, he, nullValue, "Kurin", new List<string>() { "jen", "dva", "tri" });
 
-            FileLogger.Write("Example: ", 458);
+            FileLogger.Write("Example (integer): ", 458);
 
             FileLogger.Write(new int[4]);
             FileLogger.Write(DateTime.Now);
@@ -75,7 +77,7 @@ namespace Logger.Example
 
             FileLogger.WriteLine($"Planet without formatter", planet);
             FileLogger.DumperSettings.AddFormatter(new PlanetFormatter());
-            FileLogger.WriteLine($"Planet with ormatter", planet);
+            FileLogger.WriteLine($"Planet with formatter", planet);
 
 
             HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create("http://www.google.com");
@@ -110,6 +112,9 @@ namespace Logger.Example
             }
 
             FileLogger.WriteLine(new P1());
+
+
+            Process.Start("notepad++.exe",FileLogger.Settings.FilePath);
         }
     }
 }

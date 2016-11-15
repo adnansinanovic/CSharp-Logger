@@ -20,11 +20,11 @@ namespace Logger.Fomatters
             tw.Write(text);
         }
 
-        public void WriteValue(object value, TextWriter tw)
+        public void WriteValue(object value, TextWriter tw, bool withName = false)
         {
             bool isString = (value is string);
 
-            string v = value == null ? "null" : isString ? $"\"{value.ToString()}\"" : value.ToString();
+            string v = value == null ? "null" : (isString && withName) ? $"\"{value.ToString()}\"" : value.ToString();
 
             WriteText(v, 0, tw);
         }

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Sinantrop.Logger</id>
+    <version>$version$</version>
+    <title>Sinantrop Logger</title>
+    <authors>Adnan Sinantrop</authors>
+    <owners>Adnan Sinantrop</owners>    
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Simple logging utility</description>
+    <releaseNotes>Initial.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>file logger app logging logs traverse object dumper dump recursive</tags>
+  </metadata>
+</package>

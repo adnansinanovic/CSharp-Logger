@@ -38,6 +38,7 @@ namespace Logger
                 else
                 {
                     IDumpFormatter formatter = GetFormatter(node);
+                    bool processed = true;
                     if (formatter != null)
                     {
                         _formatter.WriteName(node.GetNames(), node.Level, tw, Settings.WriteElementType);
@@ -45,15 +46,11 @@ namespace Logger
                     }
                     else
                     {
-                        if (node.Item is DateTime)
-                        {
-                        }
-
                         PrepareChildren(nodes, node, node.GetChildren(Settings));
-                        ProcessNode(nodes, node, tw);                        
+                        processed = ProcessNode(nodes, node, tw);
                     }
 
-                    if (nodes.Count > 0)
+                    if (processed && nodes.Count > 0)
                         _formatter.NewLine(tw);
                 }
             }
@@ -67,18 +64,21 @@ namespace Logger
             return formatter;
         }
 
-        private void ProcessNode(Stack<TraverseNode> nodes, TraverseNode node, TextWriter tw)
+        private bool ProcessNode(Stack<TraverseNode> nodes, TraverseNode node, TextWriter tw)
         {
-            if (node.Name == OBJECT_END)            
+            bool result = true;
+            if (node.Name == OBJECT_END)
                 _formatter.WriteText("}", node.Level, tw);
             else if (node.Name == OBJECT_START)
                 _formatter.WriteText("{", node.Level, tw);
             else
-                Write(nodes, node, tw);
+                result = Write(nodes, node, tw);
+
+            return result;
         }
 
         private void PrepareChildren(Stack<TraverseNode> nodes, TraverseNode node, IEnumerable<TraverseNode> children)
-        {            
+        {
             if (children.Any())
                 nodes.Push(new TraverseNode(OBJECT_END, OBJECT_END, OBJECT_END, node, node.Level));
 
@@ -89,30 +89,39 @@ namespace Logger
                 nodes.Push(new TraverseNode(OBJECT_START, OBJECT_START, OBJECT_START, node, node.Level));
         }
 
-        private void Write(Stack<TraverseNode> nodes, TraverseNode node, TextWriter tw)
+        private bool Write(Stack<TraverseNode> nodes, TraverseNode node, TextWriter tw)
         {
+            bool result = false;
+            bool isNamed = false;
             if (!string.IsNullOrWhiteSpace(node.Name))
+            {
+                isNamed = true;
                 _formatter.WriteName(node.GetNames(), node.Level, tw, Settings.WriteElementType);
+                result = true;
+            }
 
             object obj = node.Item;
 
             if (obj == null || obj is ValueType || obj is string)
             {
-                _formatter.WriteValue(obj, tw);
+                _formatter.WriteValue(obj, tw, isNamed);
+                result = true;
             }
             else if (obj is IEnumerable)
             {
                 IList<object> collection = (obj as IEnumerable).Cast<object>().ToList();
 
                 List<TraverseNode> children = new List<TraverseNode>();
-                for (int i=0; i<collection.Count(); i++)
-                {                    
+                for (int i = 0; i < collection.Count(); i++)
+                {
                     object item = collection[i];
-                    children.Add(new TraverseNode($"[{i}]", $"{item?.GetType().FullName}[]", item, node, node.Level + 1));                    
+                    children.Add(new TraverseNode($"[{i}]", $"{item?.GetType().FullName}[]", item, node, node.Level + 1));
                 }
 
-                PrepareChildren(nodes, node, children.Reverse<TraverseNode>());                
-            }       
+                PrepareChildren(nodes, node, children.Reverse<TraverseNode>());
+            }
+
+            return result;
         }
     }
 }
